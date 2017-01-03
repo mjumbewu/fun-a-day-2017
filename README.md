@@ -7,3 +7,6 @@ won't strictly be simulations. They may be visualizations or some other kind of
 digital representation of some real phenomenon.
 
 With luck, I'll see you at [Fun-A-Day Philadelphia](https://www.facebook.com/FunaDay/)!
+
+01. [Bouncing Ball](01-bouncing-ball/)
+02. [Celestial Bodies](02-celestial-bodies/)
