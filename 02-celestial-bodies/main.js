@@ -111,6 +111,7 @@ var bodyEls = [
 ];
 var distEl = document.querySelector('#dist');
 var avgVelEl = document.querySelector('#avg-vel');
+var graphRestart = true;
 
 function updateBodyViews(time) {
   let [, {objects}] = world.stateAt(time);
@@ -131,11 +132,13 @@ function updateGraphViews(time) {
   let delta = state0.pos.subtract(state1.pos);
   let dist = delta.magnitude();
   let distPath = distEl.getAttribute('d');
-  distEl.setAttribute('d', distPath + ' L ' + (time) + ' ' + (dist*5));
+  distEl.setAttribute('d', distPath + (graphRestart ? ' M ' : ' L ') + (time) + ' ' + (dist*5));
 
   let avgVel = (state0.vel.magnitude() + state1.vel.magnitude()) / 2;
   let velPath = avgVelEl.getAttribute('d');
-  avgVelEl.setAttribute('d', velPath + ' L ' + (time) + ' ' + (avgVel*10));
+  avgVelEl.setAttribute('d', velPath + (graphRestart ? ' M ' : ' L ') + (time) + ' ' + (avgVel*10));
+
+  graphRestart = false;
 }
 
 var world = new World(0, [new Body([3, 3], [0, -1.9], 1000000000000.0),
@@ -160,6 +163,7 @@ function updateRange() {
 
 function playFromRangeThumb() {
   let time = parseFloat(historyRange.value);
+  graphRestart = true;
   world.spliceAt(time);
   world.play();
 }
