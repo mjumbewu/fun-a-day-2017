@@ -1,0 +1,20 @@
+svg {
+  border: 1px solid black;
+}
+
+path {
+  stroke-width: 1px;
+  fill: none;
+}
+
+#dist {
+  stroke: blue;
+}
+
+#avg-vel {
+  stroke: green;
+}
+
+[type="range"]:disabled {
+  display: none;
+}

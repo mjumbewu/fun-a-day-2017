@@ -1,0 +1,177 @@
+/* jshint esversion: 6 */
+
+var G = 6.673e-11;  // gravitational constant
+
+class Body extends StateObject {
+  constructor(pos, vel, mass, time) {
+    super(time, {pos: new Vector(pos), vel: new Vector(vel), mass});
+  }
+
+  step(t) {
+    let pos, vel, mass, time, forces;
+    [time, {pos, vel, mass}] = this.state();
+
+    forces = new Array(pos.values.length);
+    forces.fill(0);
+    forces = new Vector(forces);
+
+    let [, {objects}] = this.world.state();
+    for (let obj of objects) {
+      if (obj === this) { continue; }
+      let [, other] = obj.stateAt(time);
+      let delta = other.pos.subtract(pos);
+      let magnitude = G * mass * other.mass / Math.pow(delta.magnitude(), 2);
+      forces = forces.add(delta.unit().multiply(magnitude));
+    }
+    let acc = forces.multiply(1 / mass);
+
+    let newpos = pos.add(vel.multiply(t)).add(acc.multiply(t*t/2));
+    let newvel = vel.add(acc.multiply(t));
+    let newtime = time + t;
+
+    this.pushState(newtime, { pos: newpos, vel: newvel, mass });
+    return this;
+  }
+}
+
+class World extends eventMixin(StateObject) {
+  constructor(time, objects) {
+    super(time, { objects });
+    for (let obj of objects) {
+      obj.world = this;
+    }
+    this.time = time || 0.0;
+    this.playing = false;
+    this.timeout = null;
+  }
+
+  pause() {
+    this.playing = false;
+    clearTimeout(this.timeout);
+  }
+
+  play() {
+    this.playing = true;
+    this.step(0.02);
+  }
+
+  step(t) {
+    let [_, {objects}] = this.state();
+    for (let obj of objects) {
+      obj.step(t);
+    }
+    this.time += t;
+
+    if (this.playing) {
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => { this.step(t); }, t * 1000);
+    }
+
+    let time = this.time;
+    let event = new CustomEvent('step', { detail: {time, objects} });
+    this.dispatchEvent(event);
+  }
+
+  spliceAt(time) {
+    super.spliceAt(time);
+    this.time = Math.min(time, this.time);
+    let [_, {objects}] = this.state();
+    for (let obj of objects) {
+      obj.spliceAt(time);
+    }
+  }
+
+  playFrom(time) {
+    this.spliceAt(time);
+    this.play();
+  }
+}
+
+var svgEl = document.querySelector('svg');
+var width = parseInt(svgEl.getAttribute('width'));
+var height = parseInt(svgEl.getAttribute('height'));
+
+let sx = 20.0;
+let sy = -20.0;
+let tx = 10.0;
+let ty = height - 10.0;
+
+function screen2world(l, t) {
+  let result = [(l - tx) / sx, (t - ty) / sy];
+  return new Vector(result);
+}
+
+function world2screen(pos) {
+  return [pos.x() * sx + tx, pos.y() * sy + ty];
+}
+
+var bodyEls = [
+  document.querySelector('#body1'),
+  document.querySelector('#body2')
+];
+var distEl = document.querySelector('#dist');
+var avgVelEl = document.querySelector('#avg-vel');
+
+function updateBodyViews(time) {
+  let [, {objects}] = world.stateAt(time);
+  for (let [obj, el] of zip(objects, bodyEls)) {
+    let [, {pos}] = obj.stateAt(time);
+    let screen = world2screen(pos);
+    el.setAttribute('cx', screen[0]);
+    el.setAttribute('cy', screen[1]);
+  }
+}
+
+function updateGraphViews(time) {
+  let [, {objects}] = world.stateAt(time);
+  let [body0, body1] = objects;
+  let [, state0] = body0.stateAt(time);
+  let [, state1] = body1.stateAt(time);
+
+  let delta = state0.pos.subtract(state1.pos);
+  let dist = delta.magnitude();
+  let distPath = distEl.getAttribute('d');
+  distEl.setAttribute('d', distPath + ' L ' + (time) + ' ' + (dist*5));
+
+  let avgVel = (state0.vel.magnitude() + state1.vel.magnitude()) / 2;
+  let velPath = avgVelEl.getAttribute('d');
+  avgVelEl.setAttribute('d', velPath + ' L ' + (time) + ' ' + (avgVel*10));
+}
+
+var world = new World(0, [new Body([3, 3], [0, -1.9], 1000000000000.0),
+                          new Body([10, 3], [0, 1.9], 1000000000000.0)]);
+world.play();
+world.addEventListener('step', (evt) => {
+  updateBodyViews(world.time);
+  updateGraphViews(world.time);
+});
+
+var historyRange = document.querySelector('input[type="range"]');
+function updateRange() {
+  if (!world.playing) {
+    historyRange.min = 0;
+    historyRange.max = world.time;
+    historyRange.value = historyRange.max;
+    historyRange.disabled = false;
+  } else {
+    historyRange.disabled = true;
+  }
+}
+
+function playFromRangeThumb() {
+  let time = parseFloat(historyRange.value);
+  world.spliceAt(time);
+  world.play();
+}
+
+historyRange.addEventListener('input', (evt) => {
+  let time = parseFloat(historyRange.value);
+  updateBodyViews(time);
+});
+
+var toggleBtn = document.querySelector('button');
+toggleBtn.addEventListener('click', (evt) => {
+  if (world.playing) { world.pause(); }
+  else { playFromRangeThumb(); }
+  updateRange();
+});
