@@ -1,0 +1,26 @@
+<html>
+<head>
+  <script src="utils.js"></script>
+  <script src="vector.js"></script>
+  <script src="state.js"></script>
+  <script src="events.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <svg width="300" height="300">
+    <circle id="sun" r="10"></circle>
+    <circle id="mercury" r="5"></circle>
+    <circle id="venus" r="5"></circle>
+    <circle id="earth" r="5"></circle>
+    <circle id="moon" r="2"></circle>
+    <circle id="mars" r="5"></circle>
+  </svg>
+
+  <div class="controls">
+    <button>play/pause</button>
+    <input type="range" step="0.02" disabled class="hidden">
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
