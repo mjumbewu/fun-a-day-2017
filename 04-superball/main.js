@@ -26,6 +26,9 @@ function world2screenLength(len) {
 
 // Select the SVG elements that will act as proxies for physical elements.
 var superballEl = document.querySelector('#ball');
+let kinEEl = document.querySelector('#kin-energy');
+let potEEl = document.querySelector('#pot-energy');
+let totEEl = document.querySelector('#tot-energy');
 var surfaceEls = [
   document.querySelector('#surface1'),
   document.querySelector('#surface2'),
@@ -48,13 +51,37 @@ var surfaces = [
   new Surface([  0,  50], [ 50,   0]),
 ];
 
+function ke(time, state) {
+  let {vel} = state;
+  let speed = vel.magnitude();
+  let mass = 1;
+  let ke = mass * speed * speed / 2;
+  return -ke / 20 + 70;
+}
+
+function pe(time, state) {
+  let {pos} = state;
+  let gstrength = grav.magnitude();
+  let height = pos.dot(grav) / -gstrength;
+  let mass = 1;
+  let pe = mass * gstrength * height;
+  return -pe / 20 + 70;
+}
+
+function energy(time, state) {
+  return ke(time, state) + pe(time, state) - 70;
+}
+
 // Set up the object views
 var superballView = new CircleView(superball, superballEl);
+var kinEView = new GraphView(superball, kinEEl, ke);
+var potEView = new GraphView(superball, potEEl, pe);
+var totEView = new GraphView(superball, totEEl, energy);
 var surfaceViews = [];
 for (let [surface, surfaceEl] of zip(surfaces, surfaceEls)) {
   surfaceViews.push(new PathView(surface, surfaceEl));
 }
-var views = [superballView].concat(surfaceViews);
+var views = [superballView, kinEView, potEView, totEView].concat(surfaceViews);
 
 // Set up the world
 var world = new World(0, [superball].concat(surfaces));
@@ -84,7 +111,7 @@ historyRange.addEventListener('input', (evt) => {
   let time = parseFloat(historyRange.value);
   for (let view of views) {
     let state = view.obj.stateAt(time);
-    view.update(state);
+    view.update(state, time, false);
   }
 });
 

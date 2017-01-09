@@ -17,3 +17,12 @@ svg {
   stroke: black;
   stroke-width: 3px;
 }
+
+.graph {
+  stroke-width: 0.5px;
+  fill: none;
+}
+
+#kin-energy { stroke: blue; }
+#pot-energy { stroke: red; }
+#tot-energy { stroke: green; }

@@ -79,6 +79,11 @@ class Vector {
     }
   }
 
+  project(other) {
+    // Project this vector onto the other
+    return other.unit().multiply(this.dot(other) / other.magnitude());
+  }
+
   x() { return this.values[0]; }
   y() { return this.values[1]; }
   magnitude() {
