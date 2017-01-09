@@ -86,14 +86,22 @@ class Vector {
 
   x() { return this.values[0]; }
   y() { return this.values[1]; }
+
   magnitude() {
-    let sum = 0;
-    for (let value of this.values) {
-      sum += Math.pow(value, 2);
+    if (this._magnitude !== 0 && !this._magnitude) {
+      let sum = 0;
+      for (let value of this.values) {
+        sum += Math.pow(value, 2);
+      }
+      this._magnitude = Math.sqrt(sum);
     }
-    return Math.sqrt(sum);
+    return this._magnitude;
   }
+
   unit() {
-    return this.multiply(1.0 / this.magnitude());
+    if (!this._unit) {
+      this._unit = this.multiply(1.0 / this.magnitude());
+    }
+    return this._unit;
   }
 }
