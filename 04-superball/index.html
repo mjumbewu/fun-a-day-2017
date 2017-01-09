@@ -1,0 +1,41 @@
+<html>
+<head>
+  <script src="utils.js"></script>
+  <script src="vector.js"></script>
+  <script src="events.js"></script>
+  <script src="state.js"></script>
+
+  <!-- ontology -->
+  <script src="constants.js"></script>
+  <script src="ball.js"></script>
+  <script src="surface.js"></script>
+
+  <!-- simulation -->
+  <script src="world.js"></script>
+
+  <!-- views -->
+  <script src="views/circleview.js"></script>
+  <script src="views/pathview.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <svg viewbox="0 0 300 150">
+    <circle id="ball" r="10" />
+    <path id="surface1" />
+    <path id="surface2" />
+    <path id="surface3" />
+    <path id="surface4" />
+    <path id="surface5" />
+    <path id="surface6" />
+    <path id="surface7" />
+  </svg>
+
+  <div class="controls">
+    <button>play/pause</button>
+    <input type="range" step="0.02" disabled class="hidden">
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

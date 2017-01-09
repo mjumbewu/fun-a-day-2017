@@ -1,0 +1,19 @@
+svg {
+  border: 1px solid black;
+}
+
+#sun { fill: yellow; }
+#mercury { fill: brown; }
+#venus { fill: orange; }
+#earth { fill: blue; }
+#moon { fill: silver; }
+#mars { fill: red; }
+
+[type="range"]:disabled {
+  display: none;
+}
+
+.surface {
+  stroke: black;
+  stroke-width: 3px;
+}
