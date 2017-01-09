@@ -89,13 +89,13 @@ class World extends eventMixin(StateObject) {
 }
 
 var svgEl = document.querySelector('svg');
-var width = parseInt(svgEl.getAttribute('width'));
-var height = parseInt(svgEl.getAttribute('height'));
+var width = svgEl.viewBox.baseVal.width;
+var height = svgEl.viewBox.baseVal.height;
 
 let sx = 5e-10;
 let sy = -5e-10;
-let tx = 150;
-let ty = height - 150;
+let tx = width / 2;
+let ty = height / 2;
 
 function screen2world(l, t) {
   let result = [(l - tx) / sx, (t - ty) / sy];

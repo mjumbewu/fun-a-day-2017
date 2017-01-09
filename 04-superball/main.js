@@ -3,8 +3,8 @@
 // Set up the SVG canvas, and functions for converting from screen coordinates
 // to world coordinates.
 var svgEl = document.querySelector('svg');
-var width = parseInt(svgEl.getAttribute('width'));
-var height = parseInt(svgEl.getAttribute('height'));
+var width = svgEl.viewBox.baseVal.width;
+var height = svgEl.viewBox.baseVal.height;
 
 let sx = 1;
 let sy = -1;

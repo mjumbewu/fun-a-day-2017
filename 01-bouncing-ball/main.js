@@ -79,8 +79,8 @@ class World extends eventMixin(StateObject) {
 }
 
 var svgEl = document.querySelector('svg');
-var width = parseInt(svgEl.getAttribute('width'));
-var height = parseInt(svgEl.getAttribute('height'));
+var width = svgEl.viewBox.baseVal.width;
+var height = svgEl.viewBox.baseVal.height;
 
 let sx = 30.0;
 let sy = -30.0;
